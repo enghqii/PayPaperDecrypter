@@ -1,0 +1,16 @@
+{
+  "name": "paypaper",
+  "version": "1.0.0",
+  "description": "paypaper decrypter",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Chanwoo Jeong",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.16.0",
+    "express": "^4.14.1",
+    "node-forge": "^0.6.48"
+  }
+}
