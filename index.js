@@ -1,6 +1,5 @@
 var express = require('express')
 var path = require('path')
-var bodyParser = require('body-parser')
 var fileUpload = require('express-fileupload');
 
 var fs = require('fs')
@@ -11,8 +10,6 @@ var Iconv = require('iconv').Iconv
 
 var app = express()
 
-// app.use(bodyParser.json()); // support json encoded bodies
-// app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.use(fileUpload());
 
 app.get('/', function (req, res) {
