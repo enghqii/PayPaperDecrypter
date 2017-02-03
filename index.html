@@ -4,8 +4,8 @@
     </head>
     <body>
         <p>Pay paper Decrypter</p>
-        <form method="POST">
-            <input type="file" name="paper" accept=".htm" encType="multipart/form-data">
+        <form action="/decrypt" method="POST" encType="multipart/form-data">
+            <input type="file" name="paper" accept=".htm">
             <input type="password" name="password" maxlength=7>
             <input type="submit" value="submit">
         </form>

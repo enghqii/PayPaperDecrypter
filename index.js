@@ -1,7 +1,6 @@
 var express = require('express')
 var path = require('path')
 var bodyParser = require('body-parser')
-var multer  = require('multer')
 var fileUpload = require('express-fileupload');
 
 var fs = require('fs')
@@ -20,18 +19,31 @@ app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname + "/index.html"))
 })
 
-app.post('/', function (req, res) {
-    // console.log(req.body);
-    console.log(req.body, 'Body');
-    console.log(req.file, 'file');
-    console.log(req.files, 'files');
-    res.sendFile(path.join(__dirname + "/index.html"))
+app.post('/decrypt', function (req, res) {
+
+    jsdom.env(
+        req.files.paper.data.toString(),
+        ["http://code.jquery.com/jquery.js"],
+
+        function (err, window) {
+
+            var encrypted = window.$("input[name*='_viewData']").attr("value")
+            var decrypted = decryptPayPaper(req.body.password, encrypted)
+
+            // hack: force replace 'EUC-KR' => 'UTF-8'
+            decrypted = decrypted.replace('EUC-KR', 'UTF-8')
+
+            // send response
+            res.send(decrypted) 
+        }
+    )
 })
  
 app.listen(3000)
 
 function decryptPayPaper (password, encrypted) {
 
+    // read blob from base64 encoded string
     var blob = Buffer.from(encrypted, 'base64')
 
     // find Initialization Vector, Salt, Content from Encrypted blob
@@ -71,15 +83,3 @@ function hashSaltPassword (salt, password) {
     var saltedKey = hash.digest().slice(0, 16)
     return saltedKey
 }
-
-// jsdom.env(
-//     "0064.htm",
-//     ["http://code.jquery.com/jquery.js"],
-
-//     function (err, window) {
-//         var encrypted = window.$("input[name*='_viewData']").attr("value")
-//         var decrypted = decryptPayPaper("", encrypted)
-
-//         console.log(decrypted)
-//     }
-// )
