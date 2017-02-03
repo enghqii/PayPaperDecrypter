@@ -46,6 +46,7 @@ function decryptPayPaper (password, encrypted) {
     var blob = Buffer.from(encrypted, 'base64')
 
     // find Initialization Vector, Salt, Content from Encrypted blob
+    // ref : http://www.jensign.com/JavaScience/dotnet/DeriveBytes/
     var IV = blob.slice(56 + 2, 56 + 2 + 8)
     var salt = blob.slice(66 + 2, 66 + 2 + 16)
 
