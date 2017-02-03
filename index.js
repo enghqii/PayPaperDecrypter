@@ -2,6 +2,7 @@ var express = require('express')
 var path = require('path')
 var bodyParser = require('body-parser')
 var multer  = require('multer')
+var fileUpload = require('express-fileupload');
 
 var fs = require('fs')
 var jsdom = require("jsdom")
@@ -10,18 +11,19 @@ var crypto = require('crypto')
 var Iconv = require('iconv').Iconv
 
 var app = express()
-var upload = multer({ dest: './uploads/' })
 
-app.use(bodyParser.json()); // support json encoded bodies
-app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+// app.use(bodyParser.json()); // support json encoded bodies
+// app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+app.use(fileUpload());
 
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname + "/index.html"))
 })
 
-app.post('/', upload.any(), function (req, res) {
+app.post('/', function (req, res) {
     // console.log(req.body);
     console.log(req.body, 'Body');
+    console.log(req.file, 'file');
     console.log(req.files, 'files');
     res.sendFile(path.join(__dirname + "/index.html"))
 })
