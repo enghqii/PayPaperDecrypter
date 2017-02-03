@@ -3,6 +3,7 @@ var path = require('path')
 var fileUpload = require('express-fileupload');
 
 var fs = require('fs')
+var jQuery = require("jquery")
 var jsdom = require("jsdom")
 
 var crypto = require('crypto')
@@ -20,11 +21,12 @@ app.post('/decrypt', function (req, res) {
 
     jsdom.env(
         req.files.paper.data.toString(),
-        ["http://code.jquery.com/jquery.js"],
 
         function (err, window) {
 
-            var encrypted = window.$("input[name*='_viewData']").attr("value")
+            var $ = jQuery(window)
+
+            var encrypted = $("input[name*='_viewData']").attr("value")
             var decrypted = decryptPayPaper(req.body.password, encrypted)
 
             // hack: force replace 'EUC-KR' => 'UTF-8'
