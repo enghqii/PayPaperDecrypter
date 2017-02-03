@@ -1,58 +1,49 @@
 var express = require('express')
-var app = express()
-
 var path = require('path')
 var bodyParser = require('body-parser')
-var busboy = require('express-busboy')
+var multer  = require('multer')
+
 var fs = require('fs')
+var jsdom = require("jsdom")
 
 var crypto = require('crypto')
 var Iconv = require('iconv').Iconv
 
-// app.use(bodyParser.json()); // support json encoded bodies
-// app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+var app = express()
+var upload = multer({ dest: './uploads/' })
 
-// busboy.extend(app, {
-//     upload: true,
-// });
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-// app.get('/', function (req, res) {
-//     res.sendFile(path.join(__dirname + "/index.html"))
-// })
+app.get('/', function (req, res) {
+    res.sendFile(path.join(__dirname + "/index.html"))
+})
 
-// app.post('/', function (req, res) {
-//     // console.log(req.body);
-//     console.log(req.body);
-//     res.sendFile(path.join(__dirname + "/index.html"))
-// })
+app.post('/', upload.any(), function (req, res) {
+    // console.log(req.body);
+    console.log(req.body, 'Body');
+    console.log(req.files, 'files');
+    res.sendFile(path.join(__dirname + "/index.html"))
+})
  
-// app.listen(3000)
+app.listen(3000)
 
-function HashSaltPassword(salt, password) {
+function decryptPayPaper (password, encrypted) {
 
-    const hash = crypto.createHmac("sha1", salt)
-    hash.update(password)
-
-    var saltedKey = hash.digest().slice(0, 16)
-    return saltedKey
-}
-
-fs.readFile('encrypted.txt', function (err, data) {
-
-    if (err) {
-        return console.error(err)
-    }
-
-    var encrypted = data.toString()
     var blob = Buffer.from(encrypted, 'base64')
 
+    // find Initialization Vector, Salt, Content from Encrypted blob
     var IV = blob.slice(56 + 2, 56 + 2 + 8)
     var salt = blob.slice(66 + 2, 66 + 2 + 16)
 
     var content = blob.slice(84 + 4, blob.length)
 
-    var keyByte = [0x84, 0x2b, 0xb0, 0x0d, 0x09, 0xC8, 0x0F, 0xb9, 0xa5, 0xd1, 0x2c, 0x73, 0x90, 0x53, 0xe4, 0x8f]
-    var key = Buffer.from(keyByte)
+    // convert password into UNICODE string
+    var iconv = new Iconv('utf-8', 'UTF-16LE')
+    password = Buffer.from(password)
+    password = iconv.convert(password)
+
+    var key = hashSaltPassword(salt, password)
 
     // decrypt
     var decipher = crypto.createDecipheriv('rc2-cbc', key, IV)
@@ -61,12 +52,32 @@ fs.readFile('encrypted.txt', function (err, data) {
 
     var decrypted = Buffer.concat([decrypted1, decrypted2])
 
-    // convert 'decrypted' utf8 string from utf-16 Little Endian
+    // convert 'decrypted' to utf8 string, from utf-16 Little Endian
     var iconv = new Iconv('UTF-16LE', 'utf-8')
-    var utfDecrypted = iconv.convert(decrypted).toString()
+    var decryptedUtf8 = iconv.convert(decrypted).toString()
 
-    fs.writeFile("outout_utf8.txt", Buffer.from(utfDecrypted), function (err) {
+    return decryptedUtf8
+}
 
-    })
+function hashSaltPassword (salt, password) {
 
-})
+    const hash = crypto.createHash("SHA1")
+
+    hash.update(password)
+    hash.update(salt)
+
+    var saltedKey = hash.digest().slice(0, 16)
+    return saltedKey
+}
+
+// jsdom.env(
+//     "0064.htm",
+//     ["http://code.jquery.com/jquery.js"],
+
+//     function (err, window) {
+//         var encrypted = window.$("input[name*='_viewData']").attr("value")
+//         var decrypted = decryptPayPaper("", encrypted)
+
+//         console.log(decrypted)
+//     }
+// )
