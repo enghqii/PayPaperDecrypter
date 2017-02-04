@@ -19,6 +19,15 @@ app.get('/', function (req, res) {
 
 app.post('/decrypt', function (req, res) {
 
+    if (!req.files.paper) {
+        res.send("No file specified.")
+        return;
+    }
+    if (!req.body.password) {
+        res.send("No password specified.")
+        return;
+    }
+
     jsdom.env(
         req.files.paper.data.toString(),
 
@@ -27,13 +36,20 @@ app.post('/decrypt', function (req, res) {
             var $ = jQuery(window)
 
             var encrypted = $("input[name*='_viewData']").attr("value")
-            var decrypted = decryptPayPaper(req.body.password, encrypted)
 
-            // hack: force replace 'EUC-KR' => 'UTF-8'
-            decrypted = decrypted.replace('EUC-KR', 'UTF-8')
+            try {
+                var decrypted = decryptPayPaper(req.body.password, encrypted)
 
-            // send response
-            res.send(decrypted) 
+                // hack: force replace 'EUC-KR' => 'UTF-8'
+                decrypted = decrypted.replace('EUC-KR', 'UTF-8')
+
+                // send response
+                res.send(decrypted) 
+            }
+            catch(e) {
+                // console.log(e.message)
+                res.send(e.message)
+            }
         }
     )
 })
