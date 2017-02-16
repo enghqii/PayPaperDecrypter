@@ -4,7 +4,7 @@
 
 2. Init & Start
 ```
-npm init
+npm install
 npm start
 ```
 
