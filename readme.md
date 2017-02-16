@@ -4,7 +4,7 @@
 
 2. Init & Start
 ```
-sudo npm install
+npm install
 npm start
 ```
 
