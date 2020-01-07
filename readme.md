@@ -8,4 +8,4 @@ npm install
 npm start
 ```
 
-Go to `localhost:3000` from web browser
+Go to `localhost:3000` in your web browser. 
