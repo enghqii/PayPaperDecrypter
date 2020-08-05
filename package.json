@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.14.1",
-    "express-fileupload": "0.0.6",
+    "express-fileupload": "1.1.9",
     "iconv": "^2.2.1",
     "jquery": "^3.1.1",
     "jsdom": "^9.9.1"
